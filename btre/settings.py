@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django_extensions',
 ]
+
+SHELL_PLUS = "ipython"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
