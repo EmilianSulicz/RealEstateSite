@@ -1,5 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.views.generic import TemplateView
+from contacts.forms import ContactForm
 from .models import Contact
 
 
@@ -12,7 +14,6 @@ def contact(request):
         phone = request.POST['phone']
         message = request.POST['message']
         user_id = request.POST['user_id']
-        realtor_email = request.POST['realtor_email']
 
         if request.user.is_authenticated:
             user_id = request.user.id
@@ -29,3 +30,5 @@ def contact(request):
         messages.success(request, 'Your request has been submitted, a realtor will get back to you')
 
         return redirect('/listings/' + listing_id)
+
+

@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from django.forms import ModelForm
 from django.db import models
 
 
@@ -15,3 +15,9 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ContactForm(ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['user_id', 'listing_id', 'listing', 'name', 'email', 'phone', 'message']

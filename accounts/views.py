@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages, auth
 from django.contrib.auth.models import User
+from django.views.generic.base import View
+from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required
+
 from contacts.models import Contact
 
 
@@ -57,10 +61,18 @@ def logout(request):
     return redirect('login')
 
 
-def dashboard(request):
-    user_contacts = Contact.objects.order_by('-contact_date').filter(user_id=request.user.id)
+class Dashboard(ListView):
+    template_name = 'accounts/dashboard.html'
+    context_object_name = 'contacts'
 
-    context = {
-        'contacts': user_contacts
-    }
-    return render(request, 'accounts/dashboard.html', context)
+    def get_queryset(self):
+        return Contact.objects.order_by('-contact_date').filter(user_id=self.request.user.id)
+
+# @login_required
+# def dashboard(request):
+#     user_contacts = Contact.objects.order_by('-contact_date').filter(user_id=request.user.id)
+#
+#     context = {
+#         'contacts': user_contacts
+#     }
+#     return render(request, 'accounts/dashboard.html', context)

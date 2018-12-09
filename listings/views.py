@@ -1,32 +1,62 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, get_object_or_404
+from django.views.generic.edit import ModelFormMixin
+
 from .choices import price_choices, bedroom_choices, state_choices
-
+from django.views.generic import ListView, DetailView
 from .models import Listing
+from contacts.forms import ContactForm
 
 
-def index(request):
-    listings = Listing.objects.order_by('-list_date').filter(is_published=True)
+class Index(ListView):
+    model = Listing
+    context_object_name = "listings"
+    template_name = 'listings/listings.html'
 
-    paginator = Paginator(listings, 6)
-    page = request.GET.get('page')
-    paged_listings = paginator.get_page(page)
-
-    context = {
-        'listings': paged_listings
-    }
-
-    return render(request, 'listings/listings.html', context)
+    def get_queryset(self):
+        return Listing.objects.order_by('-list_date').filter(is_published=True)
 
 
-def listing(request, listing_id):
-    listing = get_object_or_404(Listing, pk=listing_id)
+class DetailListing(DetailView):
+    model = Listing
+    slug_field = 'id'
+    template_name = 'listings/listing.html'
+    context_object_name = 'listing'
 
-    context = {
-        'listing': listing
-    }
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            email = self.request.user.email
+            user_id = self.request.user.id
+        else:
+            email = ''
+            user_id = '0'
+        listing_id = self.object.id
+        form = ContactForm(initial={'listing': self.object.title, 'email': email, 'user_id': user_id, 'listing_id': listing_id})
+        context['form'] =form
+        return context
 
-    return render(request, 'listings/listing.html', context)
+# def index(request):
+#     listings = Listing.objects.order_by('-list_date').filter(is_published=True)
+#
+#     paginator = Paginator(listings, 6)
+#     page = request.GET.get('page')
+#     paged_listings = paginator.get_page(page)
+#
+#     context = {
+#         'listings': paged_listings
+#     }
+#
+#     return render(request, 'listings/listings.html', context)
+
+# def listing(request, listing_id):
+#     listing = get_object_or_404(Listing, pk=listing_id)
+#
+#     context = {
+#         'listing': listing
+#     }
+#
+#     return render(request, 'listings/listing.html', context)
 
 
 def search(request):
